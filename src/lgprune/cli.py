@@ -83,7 +83,7 @@ def render_report(report: Report, t: Translator, top: int | None = None) -> str:
     out = [t("report.title", backend=report.backend, db=report.db), "", table(headers, rows, right), ""]
     total = sum(s.bytes for s in report.threads)
     hist = sum(s.history_bytes for s in report.threads)
-    out.append(t("report.totals", threads=len(report.threads), total=human(total), history=human(hist)))
+    out.append(t("report.totals_one" if len(report.threads) == 1 else "report.totals_other", threads=len(report.threads), total=human(total), history=human(hist)))
     if report.file_bytes is not None:
         out.append(t("report.file", size=human(report.file_bytes)))
     out.append(t("report.official_prune", value=t("yes") if report.official_prune else t("no")))
@@ -114,7 +114,7 @@ def render_plan(plan: Plan, t: Translator) -> str:
     tot = plan.totals()
     lines = [t("plan.title", db=plan.db), t("plan.policy", policy=_policy_text(plan.policy)), "", table(headers, rows, right), ""]
     lines.append(
-        t("plan.totals", threads=tot["threads"], checkpoints=tot["checkpoints"], writes=tot["writes"],
+        t("plan.totals_one" if tot["threads"] == 1 else "plan.totals_other", threads=tot["threads"], checkpoints=tot["checkpoints"], writes=tot["writes"],
           blobs=tot["blobs"], size=human(tot["bytes"]))
     )
     return "\n".join(lines)

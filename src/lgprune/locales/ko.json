@@ -43,14 +43,16 @@
   "reason.missing": "없음",
 
   "report.title": "lgprune 보고서  [{backend}] {db}",
-  "report.totals": "스레드 {threads}개, 저장량 {total}, 그중 이력이 {history} (keep_latest 로 확보할 수 있는 양)",
+  "report.totals_one": "스레드 {threads}개, 저장량 {total}, 그중 이력이 {history} (keep_latest 로 확보할 수 있는 양)",
+  "report.totals_other": "스레드 {threads}개, 저장량 {total}, 그중 이력이 {history} (keep_latest 로 확보할 수 있는 양)",
   "report.file": "디스크의 파일 크기(db + WAL): {size}",
   "report.official_prune": "설치된 체크포인터의 공식 prune(): {value}",
   "report.hint": "keep_latest 뒤에도 최신 상태는 남습니다. 긴 대화는 가장 최근 체크포인트에 메시지 전체를 담고 있습니다.",
 
   "plan.title": "lgprune 계획  {db}",
   "plan.policy": "정책: {policy}",
-  "plan.totals": "바꿀 것: 스레드 {threads}개, 체크포인트 {checkpoints}, 쓰기 {writes}, 블롭 {blobs}, 약 {size}",
+  "plan.totals_one": "바꿀 것: 스레드 {threads}개, 체크포인트 {checkpoints}, 쓰기 {writes}, 블롭 {blobs}, 약 {size}",
+  "plan.totals_other": "바꿀 것: 스레드 {threads}개, 체크포인트 {checkpoints}, 쓰기 {writes}, 블롭 {blobs}, 약 {size}",
   "plan.readonly": "계획만 만들었습니다 — 데이터베이스는 바뀌지 않았습니다.",
   "plan.saved": "계획을 {path} 에 저장했습니다  (다음: lgprune apply {path} --yes)",
   "plan.all_refused": "지정한 스레드가 모두 거부되었거나 건너뛰어졌습니다 — 할 일이 없습니다.",

@@ -43,14 +43,16 @@
   "reason.missing": "missing",
 
   "report.title": "lgprune report  [{backend}] {db}",
-  "report.totals": "{threads} threads, {total} stored, {history} of it is history (what keep_latest can free)",
+  "report.totals_one": "{threads} thread, {total} stored, {history} of it is history (what keep_latest can free)",
+  "report.totals_other": "{threads} threads, {total} stored, {history} of it is history (what keep_latest can free)",
   "report.file": "file size on disk (db + WAL): {size}",
   "report.official_prune": "official prune() in the installed checkpointer: {value}",
   "report.hint": "The latest state stays after keep_latest: a long conversation keeps its full message list in the newest checkpoint.",
 
   "plan.title": "lgprune plan  {db}",
   "plan.policy": "policy: {policy}",
-  "plan.totals": "to change: {threads} threads, {checkpoints} checkpoints, {writes} writes, {blobs} blobs, about {size}",
+  "plan.totals_one": "to change: {threads} thread, {checkpoints} checkpoints, {writes} writes, {blobs} blobs, about {size}",
+  "plan.totals_other": "to change: {threads} threads, {checkpoints} checkpoints, {writes} writes, {blobs} blobs, about {size}",
   "plan.readonly": "This is a plan only - the database was not changed.",
   "plan.saved": "plan saved to {path}  (next: lgprune apply {path} --yes)",
   "plan.all_refused": "Every thread you named was refused or skipped - nothing to do.",

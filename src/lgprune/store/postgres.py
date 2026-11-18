@@ -49,6 +49,18 @@ WHERE {where} v.value = 'true'::jsonb AND EXISTS (
 """
 
 
+_AUTH_MARKERS = ("password authentication failed", "no password supplied", "fe_sendauth")
+_AUTH_SQLSTATES = ("28P01", "28000")
+
+
+def is_auth_failure(error: BaseException) -> bool:
+    """True when a psycopg error means the server wanted a (different) password."""
+    if getattr(error, "sqlstate", None) in _AUTH_SQLSTATES:
+        return True
+    text = str(error).lower()
+    return any(marker in text for marker in _AUTH_MARKERS)
+
+
 def redact_url(url: str) -> str:
     """Drop the password so plans never contain secrets (libpq reads PGPASSWORD / .pgpass)."""
     parts = urlsplit(url)
@@ -85,7 +97,11 @@ class PostgresStore:
             )
         except psycopg.Error as e:
             detail = str(e).strip().splitlines()[0]
-            if urlsplit(url).password is None and not os.environ.get("PGPASSWORD"):
+            if (
+                urlsplit(url).password is None
+                and not os.environ.get("PGPASSWORD")
+                and is_auth_failure(e)
+            ):
                 # 계획 파일은 비밀번호를 지운 URL 을 담는다 — 비밀번호를 어디서 받는지 알려 준다
                 raise LgpruneError(
                     f"cannot connect to Postgres: {e} (the URL has no password: set PGPASSWORD, "

@@ -23,7 +23,7 @@ from .policy import Policy, parse_duration
 from .reclaim import reclaim
 from .store import PostgresStore, SqliteStore, Store, open_store
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "ApplyResult",

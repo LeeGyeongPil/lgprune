@@ -80,9 +80,8 @@ def test_pg_url_without_password_explains_where_it_comes_from(monkeypatch: pytes
         port = s.getsockname()[1]
     url = f"postgresql://postgres@127.0.0.1:{port}/postgres?connect_timeout=3"
     code, _, err = run_cli("report", url)
-    assert code == 1
-    assert "PGPASSWORD" in err and "--db" in err
-    assert "PGPASSWORD" in run_cli("--lang", "ko", "report", url)[2]
+    # 연결 거부는 비밀번호 문제가 아니므로 힌트를 붙이지 않는다(F-1)
+    assert code == 1 and "cannot connect to Postgres" in err and "PGPASSWORD" not in err
     # 비밀번호가 주어졌으면(PGPASSWORD) 그 안내는 하지 않는다 — 원인이 다르다
     monkeypatch.setenv("PGPASSWORD", "x")
     code, _, err = run_cli("report", url)
@@ -109,3 +108,12 @@ def test_tour_runs_end_to_end(tmp_path: Path) -> None:
     assert "one more turn -> 42 messages" in out
     assert "integrity_check: ok" in out
     assert (tmp_path / "tour" / "sample.bak.sqlite").exists()
+
+
+def test_singular_thread_wording(db: Path) -> None:
+    import sqlite3
+
+    first = sqlite3.connect(db).execute("SELECT thread_id FROM checkpoints LIMIT 1").fetchone()[0]
+    code, out, _ = run_cli("--lang", "en", "plan", db, "--threads", first)
+    assert code == 0
+    assert "1 thread," in out and "1 threads" not in out
