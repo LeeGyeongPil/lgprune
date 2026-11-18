@@ -1,0 +1,50 @@
+# No keys or network services needed: the sample database is made by real LangGraph graphs
+# with plain function nodes. Postgres tests run against a postgres service container.
+name: ci
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"   # weekly: catch upstream LangGraph / checkpointer changes
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: "3.11"
+            resolution: lowest-direct   # the minimum versions in pyproject.toml
+          - python: "3.13"
+            resolution: locked          # uv.lock
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      LGPRUNE_TEST_PG_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - run: uv python install ${{ matrix.python }}
+      - name: install (locked)
+        if: matrix.resolution == 'locked'
+        run: uv sync --locked --python ${{ matrix.python }}
+      - name: install (lowest direct versions)
+        if: matrix.resolution == 'lowest-direct'
+        run: uv sync --resolution lowest-direct --python ${{ matrix.python }}
+      - run: uv run --no-sync pytest -q
+      - name: postgres tests must run, not skip
+        shell: bash
+        run: uv run --no-sync pytest -q -m pg tests/test_postgres.py -rs | tee pg.log && ! grep -q skipped pg.log
+      - run: uv run --no-sync lgprune tour --lang en
+      - run: uv build
