@@ -1,0 +1,10 @@
+{
+  "name": "lgprune-test-pglite",
+  "private": true,
+  "description": "Postgres stand-in for the lgprune test suite (PGlite over the Postgres wire protocol).",
+  "license": "MIT",
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.16",
+    "@electric-sql/pglite-socket": "0.2.19"
+  }
+}
