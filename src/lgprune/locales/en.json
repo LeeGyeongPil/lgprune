@@ -155,6 +155,7 @@
   "err.disk_space": "not enough free disk space for VACUUM ({free} bytes free, about {need} needed)",
   "err.pg_extra": "Postgres support needs the extra: pip install 'lgprune[postgres]'",
   "err.pg_connect": "cannot connect to Postgres: {detail}",
+  "err.pg_connect_nopw": "cannot connect to Postgres: {detail}. The URL has no password (plan files never store it): set PGPASSWORD, use ~/.pgpass or pass --db URL.",
   "err.pg_schema": "no LangGraph checkpoint tables in this database (missing: {missing})",
   "err.pg_no_prune": "the installed langgraph-checkpoint-postgres has no prune(). Upgrade it: pip install -U 'langgraph-checkpoint-postgres>=3.2.0'",
   "err.retries": "gave up after repeated concurrent-update conflicts: {detail}. Nothing was changed.",

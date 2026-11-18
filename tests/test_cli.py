@@ -70,6 +70,25 @@ def test_usage_errors_exit_1(capsys: pytest.CaptureFixture[str]) -> None:
     capsys.readouterr()
 
 
+def test_pg_url_without_password_explains_where_it_comes_from(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Plan files drop the password; a failed connect must say how to supply it (no server needed)."""
+    pytest.importorskip("psycopg")
+    import socket
+
+    with socket.socket() as s:  # 아무도 듣지 않는 포트 -> 바로 연결 실패
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    url = f"postgresql://postgres@127.0.0.1:{port}/postgres?connect_timeout=3"
+    code, _, err = run_cli("report", url)
+    assert code == 1
+    assert "PGPASSWORD" in err and "--db" in err
+    assert "PGPASSWORD" in run_cli("--lang", "ko", "report", url)[2]
+    # 비밀번호가 주어졌으면(PGPASSWORD) 그 안내는 하지 않는다 — 원인이 다르다
+    monkeypatch.setenv("PGPASSWORD", "x")
+    code, _, err = run_cli("report", url)
+    assert code == 1 and "cannot connect to Postgres" in err and "PGPASSWORD" not in err
+
+
 def test_sample_command(tmp_path: Path) -> None:
     out_db = tmp_path / "s.sqlite"
     code, out, _ = run_cli("sample", out_db)

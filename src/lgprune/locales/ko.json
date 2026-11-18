@@ -155,6 +155,7 @@
   "err.disk_space": "VACUUM 에 필요한 여유 디스크가 부족합니다(여유 {free} 바이트, 약 {need} 필요)",
   "err.pg_extra": "Postgres 를 쓰려면 추가 설치가 필요합니다: pip install 'lgprune[postgres]'",
   "err.pg_connect": "Postgres 에 연결할 수 없습니다: {detail}",
+  "err.pg_connect_nopw": "Postgres 에 연결할 수 없습니다: {detail}. URL 에 비밀번호가 없습니다(계획 파일에는 저장하지 않음): PGPASSWORD 를 설정하거나 ~/.pgpass 를 쓰거나 --db URL 을 넘기세요.",
   "err.pg_schema": "이 데이터베이스에 LangGraph 체크포인트 테이블이 없습니다(없는 것: {missing})",
   "err.pg_no_prune": "설치된 langgraph-checkpoint-postgres 에 prune() 이 없습니다. 업그레이드하세요: pip install -U 'langgraph-checkpoint-postgres>=3.2.0'",
   "err.retries": "동시 변경 충돌이 반복되어 포기했습니다: {detail}. 아무것도 바꾸지 않았습니다.",

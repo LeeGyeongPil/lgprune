@@ -17,6 +17,7 @@ fingerprint mismatch can still roll everything back before commit.
 
 from __future__ import annotations
 
+import os
 import re
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -83,9 +84,16 @@ class PostgresStore:
                 url, autocommit=True, prepare_threshold=None, row_factory=dict_row, connect_timeout=15
             )
         except psycopg.Error as e:
-            raise LgpruneError(
-                f"cannot connect to Postgres: {e}", key="err.pg_connect", detail=str(e).strip().splitlines()[0]
-            ) from e
+            detail = str(e).strip().splitlines()[0]
+            if urlsplit(url).password is None and not os.environ.get("PGPASSWORD"):
+                # 계획 파일은 비밀번호를 지운 URL 을 담는다 — 비밀번호를 어디서 받는지 알려 준다
+                raise LgpruneError(
+                    f"cannot connect to Postgres: {e} (the URL has no password: set PGPASSWORD, "
+                    "use ~/.pgpass or pass --db URL)",
+                    key="err.pg_connect_nopw",
+                    detail=detail,
+                ) from e
+            raise LgpruneError(f"cannot connect to Postgres: {e}", key="err.pg_connect", detail=detail) from e
         try:
             # 잠금을 오래 기다리지 않게 — 기다리다 실패하면 아무것도 바꾸지 않고 종료 코드 1
             ms = max(1, int(busy_timeout * 1000))

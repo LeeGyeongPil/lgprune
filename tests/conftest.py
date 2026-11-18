@@ -19,6 +19,7 @@ import subprocess
 import time
 from collections.abc import Iterator
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -32,7 +33,8 @@ PGLITE_DIR = HERE / "pglite"
 @pytest.fixture(autouse=True)
 def _english_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
     # 개발자 컴퓨터의 언어 설정이 테스트 결과를 바꾸지 않게 한다
-    for name in ("LGPRUNE_LANG", "LC_ALL", "LC_MESSAGES", "LANG", "LGPRUNE_DB"):
+    # PGPASSWORD 도 지운다: 비밀번호가 필요한 테스트는 pg_url 픽스처가 문서대로 다시 넣는다
+    for name in ("LGPRUNE_LANG", "LC_ALL", "LC_MESSAGES", "LANG", "LGPRUNE_DB", "PGPASSWORD"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -143,13 +145,22 @@ def pg_server(tmp_path_factory: pytest.TempPathFactory) -> Iterator[str]:
 
 
 @pytest.fixture
-def pg_url(pg_server: str) -> str:
-    """Empty the checkpoint tables and load the four sample threads."""
+def pg_url(pg_server: str, monkeypatch: pytest.MonkeyPatch) -> str:
+    """Empty the checkpoint tables and load the four sample threads.
+
+    Plan files store the URL without the password, so `apply`/`verify` from a
+    plan need PGPASSWORD - exactly as for a user. PGlite accepts any password,
+    a real server (CI) does not, so we always set it the documented way.
+    """
     import psycopg
     from langgraph.checkpoint.postgres import PostgresSaver
     from psycopg.rows import dict_row
 
     from lgprune.sample import fill
+
+    password = urlsplit(pg_server).password
+    if password is not None:
+        monkeypatch.setenv("PGPASSWORD", password)
 
     with psycopg.connect(pg_server, autocommit=True, prepare_threshold=None, row_factory=dict_row) as conn:
         saver = PostgresSaver(conn)
