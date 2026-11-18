@@ -1,0 +1,24 @@
+# lgprune retention policy
+#   lgprune plan agent.sqlite --policy examples/policy.toml -o plan.json
+# Command-line flags override these values.
+
+# Threads idle for at least this long keep only their latest checkpoint
+# (per namespace, with its pending writes). History and time travel before it are removed.
+trim_after = "1d"
+
+# Threads idle for at least this long are deleted completely.
+delete_after = "30d"
+
+# The N most recently active threads are never touched.
+keep_recent = 20
+
+# Threads stopped at interrupt() (waiting for a human) are never touched.
+exclude_interrupted = true
+
+# Only thread IDs matching one of these globs are considered (empty = all).
+include = []
+
+# Thread IDs matching these globs are never touched.
+exclude = ["prod-*", "pinned-*"]
+
+# DeltaChannel threads are never trimmed with keep_latest - there is no option to change that.
