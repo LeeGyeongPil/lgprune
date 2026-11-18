@@ -1,6 +1,6 @@
 [project]
 name = "lgprune"
-version = "0.1.0"
+version = "0.1.1"
 description = "Report, plan, apply and reclaim retention for LangGraph checkpoint databases (SQLite and Postgres) without breaking resume, interrupts or DeltaChannel threads."
 readme = "README.md"
 license = "MIT"
